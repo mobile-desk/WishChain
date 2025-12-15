@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Wisher Dashboard - WishChain{% endblock %}
+
+{% block content %}
+<div class="py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-white mb-2">Welcome, {{ request.user.first_name }}!</h1>
+        <p class="text-white/70">Manage your wishes and track their status</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white/5 border border-white/10 rounded-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-white/70 text-sm mb-1">Total Wishes</p>
+                    <p class="text-3xl font-bold text-white">{{ total_wishes|default:0 }}</p>
+                </div>
+                <div class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary">favorite</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white/5 border border-white/10 rounded-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-white/70 text-sm mb-1">Pending</p>
+                    <p class="text-3xl font-bold text-white">{{ pending_wishes|default:0 }}</p>
+                </div>
+                <div class="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                    <span class="material-symbols-outlined text-yellow-500">schedule</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white/5 border border-white/10 rounded-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-white/70 text-sm mb-1">Fulfilled</p>
+                    <p class="text-3xl font-bold text-white">{{ fulfilled_wishes|default:0 }}</p>
+                </div>
+                <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                    <span class="material-symbols-outlined text-green-500">check_circle</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mb-8">
+        <a href="{% url 'wishes:create_wish' %}" 
+           class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-medium px-6 py-3 rounded-lg transition-colors">
+            <span class="material-symbols-outlined">add</span>
+            <span>Make a New Wish</span>
+        </a>
+    </div>
+
+    <!-- Wishes List -->
+    <div class="bg-white/5 border border-white/10 rounded-lg p-6">
+        <h2 class="text-xl font-bold text-white mb-4">Your Wishes</h2>
+        
+        {% if wishes %}
+            <div class="space-y-4">
+                {% for wish in wishes %}
+                    <div class="bg-white/5 border border-white/10 rounded-lg p-4">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold text-white mb-2">{{ wish.title }}</h3>
+                                <p class="text-white/70 text-sm mb-3">{{ wish.description|truncatewords:30 }}</p>
+                                <div class="flex items-center gap-4 text-sm">
+                                    <span class="text-white/50">Created: {{ wish.created_at|date:"M d, Y" }}</span>
+                                    <span class="px-2 py-1 rounded text-xs font-medium
+                                        {% if wish.status == 'pending' %}bg-yellow-500/20 text-yellow-500
+                                        {% elif wish.status == 'fulfilled' %}bg-green-500/20 text-green-500
+                                        {% else %}bg-gray-500/20 text-gray-500{% endif %}">
+                                        {{ wish.get_status_display }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <span class="material-symbols-outlined text-6xl text-white/30 mb-4">favorite</span>
+                <p class="text-white/70 mb-4">You haven't made any wishes yet.</p>
+                <a href="{% url 'wishes:create_wish' %}" 
+                   class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-medium px-6 py-3 rounded-lg transition-colors">
+                    <span class="material-symbols-outlined">add</span>
+                    <span>Make Your First Wish</span>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

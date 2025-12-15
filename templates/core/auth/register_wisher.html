@@ -1,0 +1,482 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Wisher Register - WishChain</title>
+    <link rel="icon" href="{% static 'img/logo6.png' %}" type="image/png">
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0891B2",
+                        "primary-dark": "#0E7490",
+                        "background": "#012A34",
+                        "surface": "#024959",
+                        "text": "#FFFFFF",
+                        "subtle": "#E5E7EB",
+                        "border": "#0E7490"
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #012A34;
+            color: #FFFFFF;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-background">
+    <div class="relative min-h-screen flex flex-col">
+        <!-- Background elements -->
+        <div class="absolute inset-0 z-0 opacity-20">
+            <div class="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 rounded-full bg-gradient-to-br from-cyan-300/50 to-cyan-600/50 blur-3xl"></div>
+            <div class="absolute -bottom-1/4 -right-1/4 w-1/2 h-1/2 rounded-full bg-gradient-to-tl from-cyan-600/50 to-cyan-300/50 blur-3xl"></div>
+        </div>
+
+        <!-- Main content -->
+        <div class="relative z-10 flex-1 flex flex-col">
+            <!-- Header -->
+            <header class="px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex justify-between items-center">
+                    <a href="{% url 'core:home' %}" class="flex items-center gap-3">
+                        <div class="w-10 h-10">
+                            <img src="{% static 'images/logo.png' %}" alt="WishChain Logo" class="w-full h-full object-contain">
+                        </div>
+                        <h1 class="text-xl font-bold text-white">WishChain</h1>
+                    </a>
+                    <div class="flex items-center gap-4">
+                        <span class="hidden sm:inline text-subtle text-sm">Already have an account?</span>
+                        <a href="{% url 'core:login' %}" class="bg-white text-background px-4 py-2 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors">
+                            Log In
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
+                <div class="w-full max-w-md">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-white mb-2">Create Your Wish</h2>
+                        <p class="text-subtle">Tell us about yourself and what you need help with</p>
+                        <div class="mt-2">
+                            <a href="{% url 'core:register_donor' %}" class="text-primary font-medium hover:underline">
+                                Register as a donor instead
+                            </a>
+                        </div>
+                    </div>
+
+                    {% if messages %}
+                        <div class="mb-6 space-y-2">
+                            {% for message in messages %}
+                                <div class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-500/10 border border-red-500/20 text-red-400{% elif message.tags == 'success' %}bg-green-500/10 border border-green-500/20 text-green-400{% else %}bg-blue-500/10 border border-blue-500/20 text-blue-400{% endif %}">
+                                    <p class="text-sm font-medium">{{ message }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if form.non_field_errors %}
+                        <div class="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+                            {% for error in form.non_field_errors %}
+                                <p class="text-red-400 text-sm">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if form.errors %}
+                        <div class="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+                            <p class="text-red-400 text-sm font-medium mb-2">Please fix the following errors:</p>
+                            <ul class="list-disc list-inside space-y-1">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li class="text-red-400 text-sm">{{ field|title }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'core:register_wisher' %}" class="bg-surface/80 backdrop-blur-lg rounded-xl p-6 sm:p-8 shadow-lg border border-border/50">
+                        <div class="space-y-6">
+                            <style>
+                                /* Form Input Styling */
+                                input[type="text"],
+                                input[type="email"],
+                                input[type="password"],
+                                input[type="number"],
+                                select,
+                                textarea {
+                                    display: block;
+                                    width: 100%;
+                                    padding: 0.75rem 1rem;
+                                    background-color: rgba(1, 42, 52, 0.5);
+                                    border: 1px solid #0E7490;
+                                    border-radius: 0.5rem;
+                                    color: white;
+                                    font-size: 0.875rem;
+                                    line-height: 1.5;
+                                    transition: all 0.2s;
+                                }
+                                
+                                input[type="text"]:focus,
+                                input[type="email"]:focus,
+                                input[type="password"]:focus,
+                                input[type="number"]:focus,
+                                select:focus,
+                                textarea:focus {
+                                    outline: none;
+                                    border-color: #0891B2;
+                                    box-shadow: 0 0 0 2px rgba(8, 145, 178, 0.2);
+                                }
+                                
+                                /* Checkbox and Radio Styling */
+                                input[type="checkbox"],
+                                input[type="radio"] {
+                                    width: 1rem;
+                                    height: 1rem;
+                                    border: 1px solid #0E7490;
+                                    background-color: rgba(1, 42, 52, 0.5);
+                                    border-radius: 0.25rem;
+                                    color: #0891B2;
+                                }
+                                
+                                /* Select Dropdown Styling */
+                                select {
+                                    appearance: none;
+                                    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23E5E7EB' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+                                    background-repeat: no-repeat;
+                                    background-position: right 0.75rem center;
+                                    background-size: 1.25em 1.25em;
+                                    padding-right: 2.5rem;
+                                }
+                                
+                                /* Error Styling */
+                                .errorlist {
+                                    margin-top: 0.25rem;
+                                }
+                                
+                                .errorlist li {
+                                    font-size: 0.875rem;
+                                    color: #F87171;
+                                    font-family: 'Plus Jakarta Sans', sans-serif;
+                                }
+                                
+                                /* Placeholder Text */
+                                ::placeholder {
+                                    color: #E5E7EB;
+                                    opacity: 0.7;
+                                }
+                            </style>
+                            <!-- Full Name and Email - Side by side on larger screens -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Full Name -->
+                                <div>
+                                    <label for="{{ form.full_name.id_for_label }}" class="block text-sm font-medium text-subtle mb-1">Full Name</label>
+                                    {{ form.full_name }}
+                                    {% if form.full_name.errors %}
+                                        {% for error in form.full_name.errors %}
+                                            <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+
+                                <!-- Email -->
+                                <div>
+                                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-subtle mb-1">Email Address</label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                        {% for error in form.email.errors %}
+                                            <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Password Fields -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Password -->
+                                <div>
+                                    <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-subtle mb-1">Password</label>
+                                    {{ form.password1 }}
+                                    {% if form.password1.errors %}
+                                        {% for error in form.password1.errors %}
+                                            <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+
+                                <!-- Confirm Password -->
+                                <div>
+                                    <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-subtle mb-1">Confirm Password</label>
+                                    {{ form.password2 }}
+                                    {% if form.password2.errors %}
+                                        {% for error in form.password2.errors %}
+                                            <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Location Fields - Side by side on larger screens -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Country -->
+                                <div>
+                                    <label for="{{ form.country.id_for_label }}" class="block text-sm font-medium text-subtle mb-1">Country</label>
+                                    <div class="relative">
+                                        <select name="{{ form.country.name }}" id="{{ form.country.id_for_label }}" 
+                                            class="w-full px-4 py-3 bg-background/50 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-white placeholder-subtle/70 appearance-none pr-10"
+                                            style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'><path stroke=\'%23E5E7EB\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/></svg>'); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1.25em 1.25em;"
+                                            required>
+                                            {% for code, name in form.country.field.choices %}
+                                                <option value="{{ code }}" {% if form.country.value == code %}selected{% endif %} class="bg-background text-white">
+                                                    {{ name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    {% if form.country.errors %}
+                                        {% for error in form.country.errors %}
+                                            <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+
+                                <!-- City (Manual Input) -->
+                                <div id="city-field">
+                                    <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium text-subtle mb-1">City / Region <span class="text-red-500">*</span></label>
+                                    <input type="text" 
+                                        name="{{ form.city.name }}" 
+                                        id="{{ form.city.id_for_label }}"
+                                        class="w-full px-4 py-3 bg-background/50 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-white placeholder-subtle/70"
+                                        placeholder="Enter your city"
+                                        value="{{ form.city.value|default:'' }}"
+                                        required>
+                                    {% if form.city.errors %}
+                                        {% for error in form.city.errors %}
+                                            <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Who are you? -->
+                            <div class="space-y-3">
+                                <label class="block text-sm font-medium text-subtle">Who are you?</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div class="flex items-center p-3 border border-border rounded-lg hover:bg-background/30 transition-colors">
+                                        <input type="radio" id="user_type_parent" name="user_type" value="parent" class="h-4 w-4 text-primary focus:ring-primary/50" {% if form.user_type.value == 'parent' %}checked{% endif %}>
+                                        <label for="user_type_parent" class="ml-3 text-sm">Parent / Guardian</label>
+                                    </div>
+                                    <div class="flex items-center p-3 border border-border rounded-lg hover:bg-background/30 transition-colors">
+                                        <input type="radio" id="user_type_individual" name="user_type" value="individual" class="h-4 w-4 text-primary focus:ring-primary/50" {% if form.user_type.value == 'individual' %}checked{% endif %}>
+                                        <label for="user_type_individual" class="ml-3 text-sm">Individual in need</label>
+                                    </div>
+                                    <div class="flex items-center p-3 border border-border rounded-lg hover:bg-background/30 transition-colors">
+                                        <input type="radio" id="user_type_teacher" name="user_type" value="teacher" class="h-4 w-4 text-primary focus:ring-primary/50" {% if form.user_type.value == 'teacher' %}checked{% endif %}>
+                                        <label for="user_type_teacher" class="ml-3 text-sm">Teacher / School</label>
+                                    </div>
+                                    <div class="flex items-center p-3 border border-border rounded-lg hover:bg-background/30 transition-colors">
+                                        <input type="radio" id="user_type_community" name="user_type" value="community" class="h-4 w-4 text-primary focus:ring-primary/50" {% if form.user_type.value == 'community' %}checked{% endif %}>
+                                        <label for="user_type_community" class="ml-3 text-sm">Local community helper / NGO worker</label>
+                                    </div>
+                                    {% if form.user_type.errors %}
+                                        {% for error in form.user_type.errors %}
+                                            <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Type of Help Needed -->
+                            <div>
+                                <label class="block text-sm font-medium text-subtle mb-2">What kind of help do you need? (Select all that apply)</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div class="flex items-center p-3 border border-border rounded-lg hover:bg-background/30 transition-colors">
+                                        <input type="checkbox" id="help_education" name="help_needed" value="education" class="h-4 w-4 text-primary focus:ring-primary/50">
+                                        <label for="help_education" class="ml-3 text-sm">Education (school supplies, books, tuition)</label>
+                                    </div>
+                                    <div class="flex items-center p-3 border border-border rounded-lg hover:bg-background/30 transition-colors">
+                                        <input type="checkbox" id="help_food" name="help_needed" value="food" class="h-4 w-4 text-primary focus:ring-primary/50">
+                                        <label for="help_food" class="ml-3 text-sm">Food and Nutrition</label>
+                                    </div>
+                                    <div class="flex items-center p-3 border border-border rounded-lg hover:bg-background/30 transition-colors">
+                                        <input type="checkbox" id="help_health" name="help_needed" value="health" class="h-4 w-4 text-primary focus:ring-primary/50">
+                                        <label for="help_health" class="ml-3 text-sm">Health and Medical</label>
+                                    </div>
+                                    <div class="flex items-center p-3 border border-border rounded-lg hover:bg-background/30 transition-colors">
+                                        <input type="checkbox" id="help_other" name="help_needed" value="other" class="h-4 w-4 text-primary focus:ring-primary/50">
+                                        <label for="help_other" class="ml-3 text-sm">Other (please specify in your wish)</label>
+                                    </div>
+                                </div>
+                                {% if form.help_needed.errors %}
+                                    {% for error in form.help_needed.errors %}
+                                        <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <!-- Contact Preference -->
+                            <div class="space-y-3">
+                                <label class="block text-sm font-medium text-subtle">Best way to reach you</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div class="flex items-center justify-center p-3 border border-border rounded-lg hover:bg-background/30 transition-colors">
+                                        <input type="radio" id="contact_email" name="contact_preference" value="email" class="h-4 w-4 text-primary focus:ring-primary/50" {% if not form.contact_preference.value or form.contact_preference.value == 'email' %}checked{% endif %}>
+                                        <label for="contact_email" class="ml-3 text-sm">Email</label>
+                                    </div>
+                                    <div class="flex items-center justify-center p-3 border border-border rounded-lg hover:bg-background/30 transition-colors">
+                                        <input type="radio" id="contact_phone" name="contact_preference" value="phone" class="h-4 w-4 text-primary focus:ring-primary/50" {% if form.contact_preference.value == 'phone' %}checked{% endif %}>
+                                        <label for="contact_phone" class="ml-3 text-sm">Phone Call</label>
+                                    </div>
+                                    <div class="flex items-center justify-center p-3 border border-border rounded-lg hover:bg-background/30 transition-colors">
+                                        <input type="radio" id="contact_whatsapp" name="contact_preference" value="whatsapp" class="h-4 w-4 text-primary focus:ring-primary/50" {% if form.contact_preference.value == 'whatsapp' %}checked{% endif %}>
+                                        <label for="contact_whatsapp" class="ml-3 text-sm">WhatsApp</label>
+                                    </div>
+                                </div>
+                                {% if form.contact_preference.errors %}
+                                    {% for error in form.contact_preference.errors %}
+                                        <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <!-- Phone Number -->
+                            <div>
+                                <label for="{{ form.phone_number.id_for_label }}" class="block text-sm font-medium text-subtle mb-1">Phone Number (Optional)</label>
+                                {{ form.phone_number }}
+                                {% if form.phone_number.errors %}
+                                    {% for error in form.phone_number.errors %}
+                                        <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+                                {% if form.phone_number.help_text %}
+                                    <p class="mt-1 text-xs text-subtle/70">{{ form.phone_number.help_text }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Household Information -->
+                            <div>
+                                <label class="block text-sm font-medium text-subtle mb-2">Household Information</label>
+                                
+                                <!-- Has Children Toggle -->
+                                <div class="flex items-center justify-between p-3 bg-background/30 rounded-lg">
+                                    <span class="text-sm text-subtle">Do you have children?</span>
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-sm text-subtle">No</span>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="{{ form.has_children.id_for_label }}" name="{{ form.has_children.name }}" 
+                                                class="sr-only peer" {% if form.has_children.value %}checked{% endif %}>
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                        </label>
+                                        <span class="text-sm text-subtle">Yes</span>
+                                    </div>
+                                </div>
+                                {% if form.has_children.errors %}
+                                    {% for error in form.has_children.errors %}
+                                        <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+
+                                <!-- Household Size (initially hidden) -->
+                                <div id="householdSizeField" class="hidden mt-3">
+                                    <label for="{{ form.household_size.id_for_label }}" class="block text-sm font-medium text-subtle mb-1">Household Size</label>
+                                    {{ form.household_size }}
+                                    <p class="mt-1.5 text-xs text-subtle/70">Total number of people in your care (including yourself)</p>
+                                    {% if form.household_size.errors %}
+                                        {% for error in form.household_size.errors %}
+                                            <p class="mt-1 text-sm text-red-400">{{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Terms and Conditions -->
+                            <div class="pt-2">
+                                <div class="flex items-start p-3 bg-background/30 rounded-lg">
+                                    <div class="flex items-center h-5 mt-0.5">
+                                        {{ form.terms_accepted }}
+                                    </div>
+                                    <div class="ml-3">
+                                        <label for="{{ form.terms_accepted.id_for_label }}" class="text-sm text-subtle">
+                                            I agree to the <a href="#" class="text-primary hover:underline">Terms of Service</a> and 
+                                            <a href="#" class="text-primary hover:underline">Privacy Policy</a>
+                                        </label>
+                                    </div>
+                                </div>
+                                {{ form.terms_accepted.errors }}
+                            </div>
+
+                            <!-- Privacy Note -->
+                            <div class="p-4 bg-background/30 rounded-lg border border-border/50">
+                                <h4 class="text-sm font-medium text-subtle mb-1">Your privacy is important to us</h4>
+                                <p class="text-xs text-subtle/70">
+                                    We take your privacy seriously. Your personal information will only be used to process your request 
+                                    and won't be shared without your permission. You can use a nickname or first name only if you prefer.
+                                </p>
+                            </div>
+
+                            <!-- CSRF Token and Hidden Fields -->
+                            {% csrf_token %}
+                            {{ form.language }}
+                            <button type="submit" 
+                                class="w-full bg-primary hover:bg-primary-dark text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
+                                Create Account
+                            </button>
+
+                            <!-- Login link -->
+                            <p class="text-center text-sm text-subtle mt-6">
+                                Already have an account? 
+                                <a href="{% url 'core:login' %}" class="text-primary font-medium hover:underline">Log in</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Toggle household size field based on has_children checkbox
+        document.addEventListener('DOMContentLoaded', function() {
+            const hasChildrenCheckbox = document.getElementById('{{ form.has_children.id_for_label }}');
+            const householdSizeField = document.getElementById('householdSizeField');
+            
+            if (hasChildrenCheckbox && householdSizeField) {
+                function toggleHouseholdField() {
+                    if (hasChildrenCheckbox.checked) {
+                        householdSizeField.classList.remove('hidden');
+                    } else {
+                        householdSizeField.classList.add('hidden');
+                    }
+                }
+                
+                // Initial state
+                toggleHouseholdField();
+                
+                // Update on change
+                hasChildrenCheckbox.addEventListener('change', toggleHouseholdField);
+            }
+        });
+    </script>
+</body>
+</html>

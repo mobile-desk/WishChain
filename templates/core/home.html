@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="py-16 md:py-24 @container">
+    <div class="@[480px]:p-4">
+        <div class="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-xl items-center justify-center p-4"
+            data-alt="Abstract background image of glowing connected lines over a dark stylized world map"
+            style='background-image: linear-gradient(rgba(16, 19, 34, 0.8) 0%, rgba(16, 19, 34, 0.95) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuAtiZ1DDWnOB_Hrl2AkzHiD6IPXkjqbYknOb4S65-ufPwGv7BpT5ghiHbFKGmyUlXlguvpAzLCcge1QiX63CuUAF5rCCfAXcGdXPinyYwPo12DiO8qks4GN-xefEDSHiklEWlrKLL3MsNu3hCeMCXoRXuqcXNz_O5RU3r69ZutxD0i8JpC8GF0UkwODtCXbjR5Jkcfht-oUoNsL75_jratqjJDgP8i6lql7RZ8Q9nh2IXhYt034VVgfeydvYD61bolL8f3YIH9oqPY");'>
+            <div class="flex flex-col gap-2 text-center max-w-2xl">
+                <h1
+                    class="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-6xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]">
+                    Where every wish finds its angel
+                </h1>
+                <h2
+                    class="text-white/80 text-base font-normal leading-normal @[480px]:text-lg @[480px]:font-normal @[480px]:leading-normal">
+                    Connecting wishes with those who can make them a reality.
+                </h2>
+            </div>
+
+            <div class="flex-wrap gap-3 flex justify-center">
+                {% if user.is_authenticated %}
+                    <a href="{% if user.role == 'wisher' %}{% url 'wishes:create_wish' %}{% else %}{% url 'donations:donate' %}{% endif %}" 
+                       class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em] hover:opacity-90 transition-opacity">
+                        <span class="truncate">
+                            {% if user.role == 'wisher' %}Make a Wish{% else %}Grant a Wish{% endif %}
+                        </span>
+                    </a>
+                    <a href="{% if user.role == 'wisher' %}{% url 'wishes:dashboard' %}{% else %}{% url 'donations:dashboard' %}{% endif %}" 
+                       class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-white/10 text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em] hover:bg-white/20 transition-colors">
+                        <span class="truncate">My Dashboard</span>
+                    </a>
+                {% else %}
+                    <a href="{% url 'core:register' %}?role=wisher" 
+                       class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em] hover:opacity-90 transition-opacity">
+                        <span class="truncate">Make a Wish</span>
+                    </a>
+                    <a href="{% url 'core:register' %}?role=donor" 
+                       class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-white/10 text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em] hover:bg-white/20 transition-colors">
+                        <span class="truncate">Become a Donor</span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- How It Works Section -->
+<div class="py-16">
+    <h2 class="text-white text-center text-3xl font-bold leading-tight tracking-[-0.015em] px-4 pb-12 pt-5">
+        Three Simple Steps to Change a Life</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
+        <div
+            class="flex flex-1 gap-4 rounded-lg border border-white/10 bg-white/5 p-6 flex-col text-center items-center">
+            <div class="text-primary flex items-center justify-center bg-primary/20 rounded-full size-16 mb-4">
+                <span class="material-symbols-outlined !text-4xl">edit_square</span>
+            </div>
+            <div class="flex flex-col gap-1">
+                <h3 class="text-white text-xl font-bold leading-tight">1. Someone Wishes</h3>
+                <p class="text-white/70 text-sm font-normal leading-normal">Individuals and
+                    communities in need submit their wishes through our platform.</p>
+            </div>
+        </div>
+        <div
+            class="flex flex-1 gap-4 rounded-lg border border-white/10 bg-white/5 p-6 flex-col text-center items-center">
+            <div class="text-primary flex items-center justify-center bg-primary/20 rounded-full size-16 mb-4">
+                <span class="material-symbols-outlined !text-4xl">verified_user</span>
+            </div>
+            <div class="flex flex-col gap-1">
+                <h3 class="text-white text-xl font-bold leading-tight">2. We Verify</h3>
+                <p class="text-white/70 text-sm font-normal leading-normal">Our dedicated team
+                    carefully verifies each wish to ensure authenticity and impact.</p>
+            </div>
+        </div>
+        <div
+            class="flex flex-1 gap-4 rounded-lg border border-white/10 bg-white/5 p-6 flex-col text-center items-center">
+            <div class="text-primary flex items-center justify-center bg-primary/20 rounded-full size-16 mb-4">
+                <span class="material-symbols-outlined !text-4xl">volunteer_activism</span>
+            </div>
+            <div class="flex flex-col gap-1">
+                <h3 class="text-white text-xl font-bold leading-tight">3. Someone Grants</h3>
+                <p class="text-white/70 text-sm font-normal leading-normal">Angels from around
+                    the world discover and choose wishes to grant, making a direct difference.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Live Wish Map Section -->
+<div class="py-16 text-center">
+    <h2 class="text-white text-3xl font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">A
+        World Connected by Hope</h2>
+    <p class="text-white/70 max-w-xl mx-auto pb-12">Our live map shows wishes being granted in
+        real-time, a testament to the global community of hope we're building together.</p>
+    <div class="rounded-lg overflow-hidden border border-white/10">
+        <img class="w-full h-auto object-cover"
+            data-alt="A stylized dark world map with glowing blue dots and connecting lines, representing fulfilled wishes across the globe."
+            src="{% static 'images/home.png' %}" />
+    </div>
+</div>
+
+
+<!-- Featured Stories Section -->
+<div class="py-16 text-center">
+    <h2 class="text-white text-3xl font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
+        Real Wishes, Real Angels</h2>
+    <p class="text-white/70 max-w-xl mx-auto pb-12">Discover the lives you can touch. These are
+        the stories of wishes granted and hopes restored.</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white/5 rounded-lg border border-white/10 p-6 flex flex-col items-center">
+            <img class="w-24 h-24 rounded-full object-cover mb-4 border-2 border-primary"
+                data-alt="Portrait of a smiling young woman."
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBb9Chg88JDqLWEBOxPcIkDjDvV29zQsUDh2D5lfiRnnhHgT9MNgebHJEL-2WRBLqdjZLaeVBjSeTkI-s2zp0Dtkt7W8rwgBdnc_YFBWAUunU2_UFbL3BBYqVXGRZ3wpV7UmsCeHnOFkP1cCz7SBWVlwJjyK5iK-gSChC3u2RxgeRSsfCvIA9GnmYGLZt3k9QIl2ZZ9c1eFJkQ7FGI0u2GIK_KFx3XiNx6c6guyfAtepBfGRdM4VI55wz388m3GdRETbE1IJel8Jqw" />
+            <p class="text-white/90 italic">"WishChain gave my daughter the chance to receive
+                the medical equipment she desperately needed. We are forever grateful."</p>
+            <span class="mt-4 text-white font-bold">- Maria S.</span>
+        </div>
+        <div class="bg-white/5 rounded-lg border border-white/10 p-6 flex flex-col items-center">
+            <img class="w-24 h-24 rounded-full object-cover mb-4 border-2 border-primary"
+                data-alt="Portrait of a thoughtful middle-aged man."
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbRn8-KHRvXhlx5nAXDcXSA_U0Johbf7P3uYdeusKJ5Vt5GhJfYe2fWTK91qoOOLbz3ljZQNBp0908xZTpn-Pm_wIerD-A-48ghIHlzlpzmYyVDfLnTOtze4ytHTjtbaYPthIejuapPyRat1FH0EZ0pg1qb707h1WOMNykw4k2DlXVHHzMNaCaoAkUKRF4Gy4SwNhkq4spWaR0n0w0SUN5gTxgegQICWJUhWXi19cGtGry8T-Gk8FbZjzdx6psHHvTuF0Ji5mB9hQ" />
+            <p class="text-white/90 italic">"Our community library was just a dream until an
+                angel on WishChain helped us build it. It's now the heart of our town."</p>
+            <span class="mt-4 text-white font-bold">- David L.</span>
+        </div>
+        <div class="bg-white/5 rounded-lg border border-white/10 p-6 flex flex-col items-center">
+            <img class="w-24 h-24 rounded-full object-cover mb-4 border-2 border-primary"
+                data-alt="Portrait of a happy senior woman."
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDi4DRkS4MXJiZg9BM5gfA8nFyImkxkNwoBGEMG4l4iRgquVqgNIyigV1B3XFwNaBXavGUye8DWAsPQaXOKe7SP9G7jUd4hgAF41o_P74XK2JONPeIwEWB_JwG0L3BeTz3NHTHNhQ2aodlUaTmdo71fip2Fnz7zISsged_6M58EJWaSB1ZhbCxERpGkaL0P66-cxzuzwDmE74ogiBVkT7Yrsnmm6HYUrdEBsGpxuEZIPBv4hPdvKy00-8L-h340G7_D1w9xMZjHaxI" />
+            <p class="text-white/90 italic">"Seeing my wish for a wheelchair accessible van
+                granted meant I could finally regain my independence. Thank you!"</p>
+            <span class="mt-4 text-white font-bold">- Sarah J.</span>
+        </div>
+    </div>
+</div>
+<!-- Join Section -->
+<div class="py-16 text-center">
+    <h2 class="text-white text-3xl font-bold leading-tight tracking-[-0.015em] px-4 pb-12 pt-5">
+        Be the Reason a Wish Comes True</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div
+            class="rounded-lg p-8 flex flex-col items-center justify-center bg-primary/20 hover:bg-primary/30 transition-colors border border-primary/50">
+            <h3 class="text-white text-2xl font-bold mb-2">Become an Angel</h3>
+            <p class="text-white/80 mb-6">Join our global network of grantors and make a direct
+                impact on someone's life today.</p>
+            <button
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:opacity-90 transition-opacity">
+                <span class="truncate">Start Granting</span>
+            </button>
+        </div>
+        <div
+            class="rounded-lg p-8 flex flex-col items-center justify-center bg-white/5 hover:bg-white/10 transition-colors border border-white/10">
+            <h3 class="text-white text-2xl font-bold mb-2">Partner with WishChain</h3>
+            <p class="text-white/80 mb-6">Align your organization with a cause that matters.
+                Let's create change together.</p>
+            <button
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-white/10 text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-white/20 transition-colors">
+                <span class="truncate">Learn More</span>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

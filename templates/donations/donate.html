@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Grant a Wish - WishChain{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="py-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8 text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-primary/20 rounded-full mb-4">
+                <span class="material-symbols-outlined text-primary text-4xl">volunteer_activism</span>
+            </div>
+            <h1 class="text-3xl font-bold text-white mb-2">Grant a Wish</h1>
+            <p class="text-white/70">Browse wishes and make someone's dream come true</p>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
+                <p class="text-2xl font-bold text-white">{{ pending_wishes_count|default:0 }}</p>
+                <p class="text-white/70 text-sm mt-1">Pending Wishes</p>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
+                <p class="text-2xl font-bold text-white">{{ fulfilled_wishes_count|default:0 }}</p>
+                <p class="text-white/70 text-sm mt-1">Fulfilled Today</p>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
+                <p class="text-2xl font-bold text-white">{{ total_wishes_count|default:0 }}</p>
+                <p class="text-white/70 text-sm mt-1">Total Wishes</p>
+            </div>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <input 
+                        type="text" 
+                        id="search-wishes"
+                        placeholder="Search wishes by title or description..."
+                        class="w-full px-4 py-2 bg-background-dark/50 border border-white/10 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-white placeholder-white/40"
+                    >
+                </div>
+                <div class="md:w-48">
+                    <select 
+                        id="filter-status"
+                        class="w-full px-4 py-2 bg-background-dark/50 border border-white/10 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-white appearance-none"
+                        style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'><path stroke=\'%23E5E7EB\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/></svg>'); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1.25em 1.25em; padding-right: 2.5rem;"
+                    >
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="fulfilled">Fulfilled</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wishes Grid -->
+        <div id="wishes-container">
+            {% if wishes %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for wish in wishes %}
+                        <div class="wish-card bg-white/5 border border-white/10 rounded-lg p-6 hover:bg-white/10 transition-all cursor-pointer" data-wish-id="{{ wish.id }}">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-white mb-2 line-clamp-2">{{ wish.title }}</h3>
+                                    <p class="text-white/70 text-sm mb-3 line-clamp-3">{{ wish.description }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between text-xs text-white/50 mb-4">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                    {{ wish.created_at|timesince }} ago
+                                </span>
+                                <span class="px-2 py-1 rounded text-xs font-medium
+                                    {% if wish.status == 'pending' %}bg-yellow-500/20 text-yellow-500
+                                    {% elif wish.status == 'fulfilled' %}bg-green-500/20 text-green-500
+                                    {% else %}bg-gray-500/20 text-gray-500{% endif %}">
+                                    {{ wish.get_status_display }}
+                                </span>
+                            </div>
+
+                            <div class="flex items-center gap-2 text-xs text-white/50 mb-4">
+                                <span class="material-symbols-outlined text-sm">person</span>
+                                <span>{{ wish.user.first_name|default:"Anonymous" }}</span>
+                            </div>
+
+                            {% if wish.status == 'pending' %}
+                                <button 
+                                    onclick="grantWish({{ wish.id }})"
+                                    class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <span class="material-symbols-outlined text-sm">favorite</span>
+                                    <span>Grant This Wish</span>
+                                </button>
+                            {% else %}
+                                <button 
+                                    disabled
+                                    class="w-full bg-gray-500/20 text-gray-500 font-medium py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    <span class="material-symbols-outlined text-sm">check_circle</span>
+                                    <span>Already Fulfilled</span>
+                                </button>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-16">
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-white/5 rounded-full mb-4">
+                        <span class="material-symbols-outlined text-white/30 text-5xl">favorite</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-2">No Wishes Available</h3>
+                    <p class="text-white/70 mb-6">There are no wishes to grant at the moment. Check back later!</p>
+                    <a href="{% url 'donations:dashboard' %}" class="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                        <span>Back to Dashboard</span>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Pagination (if needed) -->
+        {% if wishes.has_other_pages %}
+            <div class="mt-8 flex justify-center gap-2">
+                {% if wishes.has_previous %}
+                    <a href="?page={{ wishes.previous_page_number }}" class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white hover:bg-white/10 transition-colors">
+                        Previous
+                    </a>
+                {% endif %}
+                
+                <span class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white">
+                    Page {{ wishes.number }} of {{ wishes.paginator.num_pages }}
+                </span>
+                
+                {% if wishes.has_next %}
+                    <a href="?page={{ wishes.next_page_number }}" class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white hover:bg-white/10 transition-colors">
+                        Next
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Grant Wish Modal (placeholder for future implementation) -->
+<div id="grant-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-background-dark border border-white/10 rounded-xl p-6 max-w-md w-full mx-4">
+        <h3 class="text-xl font-bold text-white mb-4">Grant This Wish</h3>
+        <p class="text-white/70 mb-6">Are you sure you want to grant this wish? This action will mark the wish as fulfilled.</p>
+        <div class="flex gap-3">
+            <button onclick="closeGrantModal()" class="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white hover:bg-white/10 transition-colors">
+                Cancel
+            </button>
+            <button id="confirm-grant" class="flex-1 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors">
+                Yes, Grant Wish
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Simple search functionality
+    document.getElementById('search-wishes')?.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const wishCards = document.querySelectorAll('.wish-card');
+        
+        wishCards.forEach(card => {
+            const title = card.querySelector('h3').textContent.toLowerCase();
+            const description = card.querySelector('p').textContent.toLowerCase();
+            const matches = title.includes(searchTerm) || description.includes(searchTerm);
+            card.style.display = matches ? 'block' : 'none';
+        });
+    });
+
+    // Filter by status
+    document.getElementById('filter-status')?.addEventListener('change', function(e) {
+        const filterValue = e.target.value;
+        const wishCards = document.querySelectorAll('.wish-card');
+        
+        wishCards.forEach(card => {
+            if (!filterValue) {
+                card.style.display = 'block';
+                return;
+            }
+            
+            const statusBadge = card.querySelector('span[class*="bg-"]');
+            const status = statusBadge.textContent.trim().toLowerCase();
+            const matches = status === filterValue;
+            card.style.display = matches ? 'block' : 'none';
+        });
+    });
+
+    // Grant wish functionality
+    function grantWish(wishId) {
+        if (!confirm('Are you sure you want to grant this wish? This will mark it as fulfilled and cannot be undone.')) {
+            return;
+        }
+        
+        // Get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');
+        
+        // Make AJAX request
+        const grantUrl = `/donations/grant/${wishId}/`;
+        fetch(grantUrl, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'fixed top-4 right-4 bg-green-500/90 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+                messageDiv.innerHTML = `
+                    <span class="material-symbols-outlined">check_circle</span>
+                    <span>${data.message}</span>
+                `;
+                document.body.appendChild(messageDiv);
+                
+                // Update the wish card
+                const wishCard = document.querySelector(`[data-wish-id="${wishId}"]`);
+                if (wishCard) {
+                    const button = wishCard.querySelector('button');
+                    button.disabled = true;
+                    button.className = 'w-full bg-gray-500/20 text-gray-500 font-medium py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2';
+                    button.innerHTML = `
+                        <span class="material-symbols-outlined text-sm">check_circle</span>
+                        <span>Already Fulfilled</span>
+                    `;
+                    
+                    // Update status badge
+                    const statusBadge = wishCard.querySelector('span[class*="bg-"]');
+                    if (statusBadge) {
+                        statusBadge.className = 'px-2 py-1 rounded text-xs font-medium bg-green-500/20 text-green-500';
+                        statusBadge.textContent = 'Fulfilled';
+                    }
+                }
+                
+                // Remove message after 3 seconds
+                setTimeout(() => {
+                    messageDiv.remove();
+                }, 3000);
+                
+                // Reload page after a short delay to update stats
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                alert(data.message || 'An error occurred while granting the wish.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while granting the wish. Please try again.');
+        });
+    }
+
+    function closeGrantModal() {
+        document.getElementById('grant-modal').classList.add('hidden');
+    }
+</script>
+{% endblock %}
+
